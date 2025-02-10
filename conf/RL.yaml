@@ -1,0 +1,97 @@
+hydra:
+  run:
+    dir: ./
+
+RL:
+  algorithm: PPO
+  policy_network: MlpPolicy
+  save_dir: PPO_Contact_AMB
+  save_freq: 50000
+  pretrain_model_path:
+  mode: train
+
+action:
+  action_num: 13
+  trans_step: 0.001
+  rotate_step: 0.2617993877991494 # np.pi/12
+
+state:
+  input_type: TTA # {TIS(Tactile Image Stacking), TDS(Tactile Difference Stacking), TTS, TTA, depth}
+  short_mem_size: 20
+  max_novel_size: 300
+  grid_size: 10
+
+reward:
+  type: AMB # {TM(touch and movement),AMB (AM + 1/sqrt(Number of visits)), AM(area and movement)}
+  area_regularizer:
+  visited_state_penalty: -0.2
+  novelty_threshold: 4
+  no_touch_threshold: 30
+  weight: [0.1, 1, 1]  # weight for touching, newly added
+
+
+termination:
+  horizon_length: 5000
+
+environment:
+  object:
+    urdf_path: [ "objects/sphere_small.urdf", "objects/cube_small.urdf"]  # {objects/sphere_small.urdf, objects/ycb/YcbGelatinBox/model.urdf}
+  #    scaled: True # Has the URDF scale alread been applied?
+  #    scale : [[0.06, 0.06, 0.06], [.10, .05, .10]]
+  pose:
+    base_position: [ 0, 0, 0.10 ]
+    base_orientation: [ 0.0, 0.0, 0, 1 ]
+    global_scaling: 1
+
+tacto:
+  width: 60
+  height: 80
+  visualize_gui: True
+  background: conf/D20816.png
+
+digit:
+  urdf_path: "thirdparty/meshes/digit.urdf"
+  # quaternion from p.getQuaternionFromEuler([0, 0, pi])
+  base_orientation: [ 0.0, 0.0, 1.0, 6.123233995736766e-17 ]
+
+pybullet_camera:
+  cameraDistance: 0.15
+  cameraYaw: 25
+  cameraPitch: -25
+  cameraTargetPosition: [ 0, 0, 0.12 ]
+
+
+visualization:
+  realtime: True
+  render: True
+
+tdn:
+  using_tdn: False
+  use_mask: False # Multiply mask to tdn depth output
+  real : false
+  tdn_weights : tdn_weights_240.pth.tar
+
+  render:
+    pixmm : 0.03
+    width : 240 
+    height : 320
+    cam_dist : 0.022
+    shear_mag : 5.0
+    pen : 
+      min : 0.0005 
+      max : 0.002
+
+  # fcrn: 
+  #   real: 
+  #     blend_sz : 10
+  #     border : 10
+  #     ratio : 0.9
+  #     clip : 5
+  #     batch_size : 1
+
+  #   sim: 
+  #     blend_sz : 0
+  #     border : 1
+  #     ratio : 0.2
+  #     clip : 5
+  #     batch_size : 1

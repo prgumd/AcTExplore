@@ -1,0 +1,80 @@
+hydra:
+  run:
+    dir: ./
+
+RL:
+  algorithm: PPO  # RecurrentPPO, PPO
+  policy_network: MlpPolicy # MlpLstmPolicy, MlpPolicy
+  settings: DEMO
+  save_dir: PPO_TEST
+  save_freq: 50000
+  pretrain_model_path: Weights/PPO_TTS_AMB/model_1000000_steps
+  mode: test
+
+action:
+  action_num: 13
+  trans_step: 0.004
+  rotate_step: 0.2617993877991494 # np.pi/12
+
+state:
+  input_type: TTS # {TIS(Tactile Image Stacking), TDS(Tactile Difference Stacking), TTS, TTA, depth}
+  short_mem_size: 20
+  max_novel_size: 300
+  grid_size: 10
+
+reward:
+  type: AMB # {TM(touch and movement),AMB (AM + 1/sqrt(Number of visits)), AM(area and movement)}
+  area_regularizer:
+  visited_state_penalty: -0.2
+  novelty_threshold: 4
+  no_touch_threshold: 30
+  weight: [0.1, 1, 1]  # weight for touching, newly added
+
+termination:
+  horizon_length: 5000
+
+environment:
+  object:
+    object_name: "Banana"
+    urdf_path: ["objects/ycb/YcbBanana/model.urdf"] 
+  pose:
+    base_position: [ 0, 0, 0.10 ]
+    base_orientation: [ 0.0, 0.0, 0, 1 ]
+    global_scaling: 1
+
+tacto:
+  width: 60
+  height: 80
+  visualize_gui: True
+  background: conf/D20816.png
+
+digit:
+  urdf_path: "../meshes/digit.urdf"
+  # quaternion from p.getQuaternionFromEuler([0, 0, pi])
+  base_orientation: [ 0.0, 0.0, 1.0, 6.123233995736766e-17 ]
+
+pybullet_camera:
+  cameraDistance: 0.2
+  cameraYaw: 25
+  cameraPitch: -30
+  cameraTargetPosition: [ 0, 0, 0.12 ]
+
+### Drill
+#pybullet_camera:
+#  cameraDistance: 0.22
+#  cameraYaw: 25
+#  cameraPitch: -30
+#  cameraTargetPosition: [ 0, 0, 0.2 ]
+#
+
+### Banana
+#pybullet_camera:
+#  cameraDistance: 0.23
+#  cameraYaw: 25
+#  cameraPitch: -40
+#  cameraTargetPosition: [ 0, 0, 0.07 ]
+
+visualization:
+  realtime: True
+  render: True
+
